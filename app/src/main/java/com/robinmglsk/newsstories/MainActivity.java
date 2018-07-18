@@ -18,7 +18,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String URL = "https://content.guardianapis.com/search";
+    private static final String API_KEY = "4a229491-771d-4453-9700-8d13a1b41835"; // Needs to be secret... ;) So don't read this github. Only here so the Udacity reviewer doesn't need to register his own key.
     private NewsStoryAdapter mAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
