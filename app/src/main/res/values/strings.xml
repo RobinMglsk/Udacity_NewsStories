@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">NewsStories</string>
+
+
+    <!-- Errors -->
+    <string name="error_no_internet_connection">Please check your internet connection.</string>
 </resources>
