@@ -49,7 +49,7 @@ public class NewsStoryAdapter extends ArrayAdapter<NewsStory> {
 
         /** Set title */
         String title = currentNewsStory.getTitle();
-        TextView titleView = (TextView) listItemView.findViewById(R.id.title);
+        TextView titleView = (TextView) listItemView.findViewById(R.id.storyTitle);
         titleView.setText(title);
 
         /** Set section */
@@ -57,23 +57,12 @@ public class NewsStoryAdapter extends ArrayAdapter<NewsStory> {
         TextView sectionView = (TextView) listItemView.findViewById(R.id.section);
         sectionView.setText(section);
 
-        /** Set author */
-        String author = currentNewsStory.getAuhtor();
-        TextView authorView = (TextView) listItemView.findViewById(R.id.author);
-        if(author != null){
-            authorView.setText(author);
-        }else{
-            authorView.setText("");
-        }
-        sectionView.setText(title);
-
         /** Set publish time */
-        Long publishedAt = currentNewsStory.getPublishedAt();
+        long publishedAt = currentNewsStory.getPublishedAt();
         TextView publishedAtView = (TextView) listItemView.findViewById(R.id.publishedAt);
         if(publishedAt != 0){
-            Date dateObject = new Date(publishedAt);
             SimpleDateFormat dateFormatter = new SimpleDateFormat("LLL dd, yyyy HH:mm");
-            String dateString = dateFormatter.format(dateObject);
+            String dateString = dateFormatter.format(publishedAt);
             publishedAtView.setText(dateString);
         }else{
             publishedAtView.setText("");
