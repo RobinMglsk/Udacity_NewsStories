@@ -3,6 +3,7 @@ package com.robinmglsk.newsstories;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -12,14 +13,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<NewsStory>> {
 
     private static final String URL = "https://content.guardianapis.com/search";
     private static final String API_KEY = "4a229491-771d-4453-9700-8d13a1b41835"; // Needs to be secret... ;) So don't read this github. Only here so the Udacity reviewer doesn't need to register his own key.
+    private static final String ITEMS = "30";
+    private static final int NEWS_STORY_LOADER_ID = 1;
     private NewsStoryAdapter mAdapter;
 
 
@@ -35,9 +41,6 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new NewsStoryAdapter(this, new ArrayList<NewsStory>());
         newsStoryListView.setAdapter(mAdapter);
         newsStoryListView.setEmptyView(findViewById(R.id.empty_list));
-
-        mAdapter.add(new NewsStory("Title","qsdsqd","https://www.robinmglsk.com"));
-
 
         /**
          * Set an item click listener on the ListView, which sends an intent to a web browser
@@ -67,11 +70,42 @@ public class MainActivity extends AppCompatActivity {
         // If there is a network connection, fetch data
         if (networkInfo != null && networkInfo.isConnected()) {
 
-
+            LoaderManager loaderManager = getLoaderManager();
+            loaderManager.initLoader(NEWS_STORY_LOADER_ID, null, this);
         }else{
             findViewById(R.id.loader).setVisibility(View.GONE);
             TextView emptyText = findViewById(R.id.empty_list);
             emptyText.setText(getString(R.string.error_no_internet_connection));
         }
+    }
+
+    @Override
+    public Loader<List<NewsStory>> onCreateLoader(int i, Bundle bundle) {
+        // Create a new loader for the given URL
+        return new NewsStoryLoader(this, URL+"?api-key="+API_KEY+"&page-size="+ITEMS);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<NewsStory>> loader, List<NewsStory> earthquakes) {
+        // Clear the adapter of previous earthquake data
+        mAdapter.clear();
+
+        // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
+        // data set. This will trigger the ListView to update.
+
+        TextView emptyText = findViewById(R.id.empty_list);
+        emptyText.setText(getString(R.string.empty_list));
+
+        findViewById(R.id.loader).setVisibility(View.GONE);
+
+        if (earthquakes != null && !earthquakes.isEmpty()) {
+            mAdapter.addAll(earthquakes);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<NewsStory>> loader) {
+        // Loader reset, so we can clear out our existing data.
+        mAdapter.clear();
     }
 }
