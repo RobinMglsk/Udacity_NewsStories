@@ -14,10 +14,11 @@ public class NewsStory {
         this.url = url;
     }
 
-    public NewsStory(String title, String sectionName, String url, String auhtor, long publishedAt){
+    public NewsStory(String title, String sectionName, String url, long publishedAt){
         this.title = title;
         this.sectionName = sectionName;
         this.url = url;
+        this.publishedAt = publishedAt;
     }
 
     public String getTitle(){
