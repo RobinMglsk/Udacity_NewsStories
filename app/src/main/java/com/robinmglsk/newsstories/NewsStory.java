@@ -5,20 +5,15 @@ public class NewsStory {
     private String title;
     private String sectionName;
     private String url;
-    private String auhtor;
+    private String author;
     private long publishedAt;
 
-    public NewsStory(String title, String sectionName, String url){
-        this.title = title;
-        this.sectionName = sectionName;
-        this.url = url;
-    }
-
-    public NewsStory(String title, String sectionName, String url, long publishedAt){
+    public NewsStory(String title, String sectionName, String url, String author, long publishedAt){
         this.title = title;
         this.sectionName = sectionName;
         this.url = url;
         this.publishedAt = publishedAt;
+        this.author = author;
     }
 
     public String getTitle(){
@@ -33,8 +28,8 @@ public class NewsStory {
         return this.url;
     }
 
-    public String getAuhtor(){
-        return this.auhtor;
+    public String getAuthor(){
+        return this.author;
     }
 
     public long getPublishedAt(){

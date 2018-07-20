@@ -7,8 +7,11 @@ import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -20,13 +23,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<NewsStory>> {
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<NewsStory>> ,SwipeRefreshLayout.OnRefreshListener {
 
     private static final String URL = "https://content.guardianapis.com/search";
     private static final String API_KEY = "4a229491-771d-4453-9700-8d13a1b41835"; // Needs to be secret... ;) So don't read this github. Only here so the Udacity reviewer doesn't need to register his own key.
     private static final String ITEMS = "30";
     private static final int NEWS_STORY_LOADER_ID = 1;
     private NewsStoryAdapter mAdapter;
+    private SwipeRefreshLayout mSwipeContainer;
 
 
     @Override
@@ -35,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         setContentView(R.layout.activity_main);
 
         checkNetworkConnection();
+
+        mSwipeContainer = findViewById(R.id.swiperefresh);
+        mSwipeContainer.setOnRefreshListener(this);
 
         /** Setup custom adapter */
         ListView newsStoryListView = (ListView) findViewById(R.id.list);
@@ -80,26 +87,42 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     }
 
     @Override
+    public void onRefresh() {
+        getLoaderManager().restartLoader(NEWS_STORY_LOADER_ID , null ,this);
+    }
+
+
+
+    @Override
     public Loader<List<NewsStory>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
-        return new NewsStoryLoader(this, URL+"?api-key="+API_KEY+"&page-size="+ITEMS);
+        return new NewsStoryLoader(this, URL+"?api-key="+API_KEY+"&page-size="+ITEMS+"&show-tags=contributor");
     }
 
     @Override
-    public void onLoadFinished(Loader<List<NewsStory>> loader, List<NewsStory> earthquakes) {
-        // Clear the adapter of previous earthquake data
+    public void onLoadFinished(Loader<List<NewsStory>> loader, List<NewsStory> newsStories) {
+        // Clear the adapter of previous news story data
         mAdapter.clear();
 
-        // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
-        // data set. This will trigger the ListView to update.
+        /**
+         * If there is a valid list of {@link NewsStory}s,then add them to the adapter's data set.
+         * This will trigger the ListView to update.
+         * */
 
         TextView emptyText = findViewById(R.id.empty_list);
         emptyText.setText(getString(R.string.empty_list));
 
         findViewById(R.id.loader).setVisibility(View.GONE);
 
-        if (earthquakes != null && !earthquakes.isEmpty()) {
-            mAdapter.addAll(earthquakes);
+        mSwipeContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeContainer.setRefreshing(false);
+            }
+        });
+
+        if (newsStories != null && !newsStories.isEmpty()) {
+            mAdapter.addAll(newsStories);
         }
     }
 

@@ -53,5 +53,16 @@
             android:textSize="12sp"
             tools:text="3:00 PM" />
 
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:maxLength="25"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="12sp"
+            tools:text="3:00 PM" />
+
     </LinearLayout>
 </LinearLayout>

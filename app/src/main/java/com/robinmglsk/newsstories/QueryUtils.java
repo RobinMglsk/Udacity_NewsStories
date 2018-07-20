@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -143,8 +144,9 @@ public class QueryUtils {
                 JSONObject story = stories.getJSONObject(i);
 
                 long webPublicationDate = 0;
+                String contributor = null;
 
-                if(story.getString("webPublicationDate") != null){
+                if(story.has("webPublicationDate")){
                     try {
                         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'", Locale.ENGLISH);
                         webPublicationDate = df.parse(story.getString("webPublicationDate")).getTime();
@@ -153,11 +155,17 @@ public class QueryUtils {
                     }
                 }
 
+                if(story.has("tags")){
+                    JSONArray tags = story.getJSONArray("tags");
+                    contributor = tags.getJSONObject(0).optString("webTitle");
+                }
+
                 newsStories.add(
                         new NewsStory(
-                                story.getString("webTitle"),
-                                story.getString("sectionName"),
-                                story.getString("webUrl"),
+                                story.optString("webTitle"),
+                                story.optString("sectionName"),
+                                story.optString("webUrl"),
+                                contributor,
                                 webPublicationDate
                         ));
             }

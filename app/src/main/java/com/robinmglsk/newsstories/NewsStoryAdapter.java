@@ -57,6 +57,11 @@ public class NewsStoryAdapter extends ArrayAdapter<NewsStory> {
         TextView sectionView = (TextView) listItemView.findViewById(R.id.section);
         sectionView.setText(section);
 
+        /** Set author */
+        String author = currentNewsStory.getAuthor();
+        TextView authorView = (TextView) listItemView.findViewById(R.id.author);
+        authorView.setText(author);
+
         /** Set publish time */
         long publishedAt = currentNewsStory.getPublishedAt();
         TextView publishedAtView = (TextView) listItemView.findViewById(R.id.publishedAt);
