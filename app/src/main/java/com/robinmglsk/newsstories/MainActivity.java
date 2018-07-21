@@ -4,12 +4,16 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -23,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     private static final String URL = "https://content.guardianapis.com/search";
     private static final String API_KEY = "4a229491-771d-4453-9700-8d13a1b41835"; // Needs to be secret... ;) So don't read this github. Only here so the Udacity reviewer doesn't need to register his own key.
-    private static final String ITEMS = "30";
     private static final int NEWS_STORY_LOADER_ID = 1;
     private NewsStoryAdapter mAdapter;
     private SwipeRefreshLayout mSwipeContainer;
@@ -91,8 +94,26 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     @Override
     public Loader<List<NewsStory>> onCreateLoader(int i, Bundle bundle) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // getString retrieves a String value from the preferences. The second parameter is the default value for this preference.
+        String quantity = sharedPrefs.getString(
+                getString(R.string.settings_quantity_key),
+                getString(R.string.settings_quantity_default));
+
+        // parse breaks apart the URI string that's passed into its parameter
+        Uri baseUri = Uri.parse(URL);
+
+        // buildUpon prepares the baseUri that we just parsed so we can add query parameters to it
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        // Append query parameter and its value.
+        uriBuilder.appendQueryParameter("api-key", API_KEY);
+        uriBuilder.appendQueryParameter("page-size", quantity);
+        uriBuilder.appendQueryParameter("show-tags", "contributor");
+
         // Create a new loader for the given URL
-        return new NewsStoryLoader(this, URL+"?api-key="+API_KEY+"&page-size="+ITEMS+"&show-tags=contributor");
+        return new NewsStoryLoader(this, uriBuilder.toString());
     }
 
     @Override
@@ -126,5 +147,24 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onLoaderReset(Loader<List<NewsStory>> loader) {
         // Loader reset, so we can clear out our existing data.
         mAdapter.clear();
+    }
+
+    @Override
+    // This method initialize the contents of the Activity's options menu.
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the Options Menu we specified in XML
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
